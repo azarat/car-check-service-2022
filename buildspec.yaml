@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+       - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 047590332772.dkr.ecr.eu-central-1.amazonaws.com
+       - REPOSITORY_URI=047590332772.dkr.ecr.eu-central-1.amazonaws.com/car-check-service
+       - IMAGE_TAG=$(echo $(echo $VERSION)'.'$CODEBUILD_BUILD_NUMBER)
+  build:
+    commands:
+      - docker build --build-arg SECRET_ID=$(echo $SECRET_ID) --build-arg REGION=$(echo $REGION) --build-arg API_HOST=$(echo $API_HOST) --build-arg GITHUB_TOKEN=$(echo $GITHUB_TOKEN) --build-arg USER_SDK_URL=$(echo $USER_SDK_URL) --build-arg CARFAX_SETTINGS=$(echo $CARFAX_SETTINGS) --build-arg PARTSLINK_SETTINGS=$(echo $PARTSLINK_SETTINGS) --build-arg CARFAX_S3_FOLDER=$(echo $CARFAX_S3_FOLDER) --build-arg PARTSLINK_S3_FOLDER=$(echo $PARTSLINK_S3_FOLDER) --build-arg PARTSLINK_ACCOUNT_LIMIT=$(echo $PARTSLINK_ACCOUNT_LIMIT) --build-arg S3_BUCKET=$(echo $S3_BUCKET) -t $REPOSITORY_URI:$IMAGE_TAG .
+  post_build:
+    commands:
+       - docker push $REPOSITORY_URI:$IMAGE_TAG
