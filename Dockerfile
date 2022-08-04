@@ -2,7 +2,7 @@ FROM 047590332772.dkr.ecr.eu-central-1.amazonaws.com/nodejs:16
 
 WORKDIR /usr/src/app
 
-ENV PORT=8080
+ENV PORT=8083
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 ARG API_HOST
@@ -33,7 +33,7 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 8080
+EXPOSE 8083
 
 RUN apt-get update
 RUN apt-get install -y gconf-service libasound2 libatk1.0-0 libcairo2 libcups2 libfontconfig1 libgdk-pixbuf2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libxss1 fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils

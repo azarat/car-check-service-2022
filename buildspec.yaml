@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
        - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 047590332772.dkr.ecr.eu-central-1.amazonaws.com
-       - REPOSITORY_URI=047590332772.dkr.ecr.eu-central-1.amazonaws.com/car-check-service
+       - REPOSITORY_URI=047590332772.dkr.ecr.eu-central-1.amazonaws.com/car-check-service-2022
        - IMAGE_TAG=$(echo $(echo $VERSION)'.'$CODEBUILD_BUILD_NUMBER)
   build:
     commands:
