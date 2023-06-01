@@ -43,7 +43,7 @@ app.setErrorHandler((err, req, res) => {
     res.status(500).send(message);
   }
 });
-app.register(carfaxController, { prefix: '/carfax' });
+// app.register(carfaxController, { prefix: '/carfax' });
 app.register(partslinkController, { prefix: '/partslink' });
 app.register(carNumberController, { prefix: '/check' });
 app.register(fastifyCron, {
