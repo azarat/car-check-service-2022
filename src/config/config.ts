@@ -34,6 +34,7 @@ class Config {
   partslinkCars: IPartslinkCars;
   s3Bucket: string;
   carfaxS3Folder: string;
+  carfaxToken: string;
   partslinkS3Folder: string;
   partslinkAccountLimit: number;
   pushLambdaSecret: string;
@@ -50,6 +51,7 @@ class Config {
     this.userSdkUrl = process.env.USER_SDK_URL;
     this.s3Bucket = process.env.S3_BUCKET;
     this.carfaxS3Folder = process.env.CARFAX_S3_FOLDER;
+    this.carfaxToken = process.env.CARFAX_TOKEN;
     this.partslinkS3Folder = process.env.PARTSLINK_S3_FOLDER;
     this.partslinkAccountLimit = +process.env.PARTSLINK_ACCOUNT_LIMIT;
   }

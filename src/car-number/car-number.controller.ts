@@ -7,7 +7,7 @@ import { GetVinDto } from './dto/plate.dto';
 
 const carNumberController = (server: FastifyInstance, _, done) => {
   server.get<Params<GetVinDto>>('/by-plate/:licensePlate', {
-    preValidation: userGuard,
+    // preValidation: userGuard,
     schema: {
       tags: ['Check'],
       description: "Get car's vin aviable cars",

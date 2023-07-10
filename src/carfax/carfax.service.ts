@@ -23,15 +23,16 @@ class CarfaxService {
     acceptLanguage: string,
   ): Promise<string> {
     const language = acceptLanguage || 'uk';
-    const { id: userId } = await verifyUser(
-      config.userSdkUrl,
-      config.userSdkSecret,
-      token as string,
-    );
+    // const { id: userId } = await verifyUser(
+    //   config.userSdkUrl,
+    //   config.userSdkSecret,
+    //   token as string,
+    // );
+    const userId = '62f3995f8283787f4b4a1231'
 
-    if (await carfaxRepository.getRequestCount() <= 0) {
-      throw new HttpError(503, 'Carfax quota is exceeded');
-    }
+    // if (await carfaxRepository.getRequestCount() <= 0) {
+    //   throw new HttpError(503, 'Carfax quota is exceeded');
+    // }
 
     if (await carfaxDbRepository.existsByUserAndVin(userId, vin)) {
       throw new HttpError(409, HttpError.REPORT_EXIST);
@@ -39,20 +40,21 @@ class CarfaxService {
 
     const { publicKey, privateKey } = getKeys(userAgent);
     const { id } = await carfaxDbRepository.createRecord(userId, vin, userAgent);
+
     const fileName = `${config.carfaxS3Folder}/${vin}.pdf`;
+
+    const hasReport = await carfaxRepository.existsReport(vin, language);
+    
     if (!(await s3.existFile(fileName))) {
       await carfaxDbRepository.updateStatus(id, StatusEnum.IN_PROGRESS);
-      const { buffer } = await carfaxRepository.createReport(vin, language);
-      await s3.uploadFile(buffer, fileName);
     }
-    await carfaxDbRepository.updateReport(id, fileName);
-    await carfaxDbRepository.updateStatus(id, StatusEnum.CREATED);
+
     const payment = new Payment(
       publicKey,
       id,
       config.carfaxPrice,
-      'DayDrive LLC',
-      `https://${config.apiHost}/carfax/callback/${id}`,
+      `DayDrive LLC / Carfax / ${vin}`,
+      `http://${config.apiHost}/carfax/callback/${id}`,
     );
     return payment.createPayment(privateKey);
   }
@@ -64,9 +66,20 @@ class CarfaxService {
     const { privateKey } = getKeys(userAgent);
     const { status } = Payment.handleCallback(body, privateKey);
     const isSuccess = ['success', 'wait_accept'].includes(status.toLowerCase());
-    if (isSuccess && reportStatus === StatusEnum.CREATED) {
+    if (isSuccess && reportStatus === StatusEnum.IN_PROGRESS) {
+
+      const fileName = `${config.carfaxS3Folder}/${vin}.pdf`;
+
+      if (!(await s3.existFile(fileName))) {
+        const { buffer } = await carfaxRepository.createReport(vin);
+        await s3.uploadFile(buffer, fileName);
+      }
+  
+      await carfaxDbRepository.updateReport(id, fileName);
+      await carfaxDbRepository.updateStatus(id, StatusEnum.CREATED);
+  
       await carfaxDbRepository.updateStatus(id, StatusEnum.PAYED);
-      await carfaxRepository.subtractRequestCount('');
+      // await carfaxRepository.subtractRequestCount('');
       const { deviceToken } = await getUserById(
         config.userSdkUrl,
         config.userSdkSecret,

@@ -62,7 +62,7 @@ class PartslinkService {
       id,
       config.partslinkPrice,
       'DayDrive LLC',
-      `https://${config.apiHost}/partslink/callback/${id}`,
+      `http://${config.apiHost}/partslink/callback/${id}`,
     );
     const paymentLink = payment.createPayment(privateKey);
     return {
@@ -132,7 +132,7 @@ class PartslinkService {
         id,
         config.partslinkPrice,
         'DayDrive LLC',
-        `https://${config.apiHost}/partslink/callback/${id}`,
+        `http://${config.apiHost}/partslink/callback/${id}`,
       );
       const paymentLink = payment.createPayment(privateKey);
       return { ...data, paymentLink };
@@ -166,7 +166,7 @@ class PartslinkService {
         id,
         config.partslinkPrice,
         'DayDrive LLC',
-        `https://${config.apiHost}/partslink/callback/${id}`,
+        `http://${config.apiHost}/partslink/callback/${id}`,
       );
       return payment.createPayment(privateKey);
     }
