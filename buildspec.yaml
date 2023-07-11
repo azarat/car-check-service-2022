@@ -18,6 +18,7 @@ phases:
         --build-arg CARFAX_SETTINGS=$(echo $CARFAX_SETTINGS) \
         --build-arg PARTSLINK_SETTINGS=$(echo $PARTSLINK_SETTINGS) \
         --build-arg CARFAX_S3_FOLDER=$(echo $CARFAX_S3_FOLDER) \
+        --build-arg CARFAX_TOKEN=$(echo $CARFAX_TOKEN) \
         --build-arg PARTSLINK_S3_FOLDER=$(echo $PARTSLINK_S3_FOLDER) \
         --build-arg PARTSLINK_ACCOUNT_LIMIT=$(echo $PARTSLINK_ACCOUNT_LIMIT) \
         --build-arg S3_BUCKET=$(echo $S3_BUCKET) -t $REPOSITORY_URI:$IMAGE_TAG .
