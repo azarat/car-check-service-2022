@@ -45,9 +45,7 @@ class CarfaxService {
 
     const hasReport = await carfaxRepository.existsReport(vin, language);
     
-    if (!(await s3.existFile(fileName))) {
-      await carfaxDbRepository.updateStatus(id, StatusEnum.IN_PROGRESS);
-    }
+    await carfaxDbRepository.updateStatus(id, StatusEnum.IN_PROGRESS);
 
     const payment = new Payment(
       publicKey,
