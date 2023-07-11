@@ -228,8 +228,9 @@ class PartslinkService {
     }
     const json = await s3.getJsonFile(`${config.partslinkS3Folder}/${vin}.json`);
     const html = this.generateHtml(json, brand);
-    const pdfBuffer = await htmlToPdf.generatePdf({ content: html }, { format: 'A4' });
-    await s3.uploadFile(pdfBuffer, filename);
+    htmlToPdf.generatePdf({ content: html }, { format: 'A4' }, async (err, buffer) => {
+      await s3.uploadFile(buffer, filename);
+    });
     return s3.getSignedUrl(filename);
   }
 

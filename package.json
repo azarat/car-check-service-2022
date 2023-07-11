@@ -38,6 +38,7 @@
     "ts-jest": "^27.0.5"
   },
   "devDependencies": {
+    "@types/html-pdf-node": "^1.0.0",
     "@types/ioredis": "^4.27.8",
     "@types/jsdom": "^16.2.13",
     "@types/node": "^16.9.4",

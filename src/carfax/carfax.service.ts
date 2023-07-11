@@ -12,6 +12,7 @@ import config from '../config/config';
 import HttpError from '../errors/HttpError';
 import { ReportInfoDto } from './dto/report-info.dto';
 import { getKeys } from '../user-agent';
+import { generatePdf } from 'html-pdf-node';
 
 class CarfaxService {
   private static NOTIFICATION_TYPE = 'CARFAX_PAYED';
@@ -57,6 +58,26 @@ class CarfaxService {
     return payment.createPayment(privateKey);
   }
 
+  async savepdf(body: CallbackDto, id: string): Promise<void> {
+    console.log(id, "id");
+    const { vin } = await carfaxDbRepository.findById(id);
+    console.log(vin, "vin");
+
+    const fileName = `${config.carfaxS3Folder}/${vin}_test1.pdf`;
+    let options = { format: 'A4' };
+
+    if (!(await s3.existFile(fileName))) {
+      // const { buffer } = await carfaxRepository.bufferReport(vin);
+      let file = { url: "https://report.covin.top/api/report/24332a9f35514b7da2297aa8fc633bc3" };
+
+      generatePdf(file, options, async (err, buffer) => {
+        console.log("ok1");
+        await s3.uploadFile(buffer, fileName);
+        console.log("ok2");
+      });
+    }
+  }
+
   async payReport(body: CallbackDto, id: string): Promise<void> {
     const {
       user, vin, status: reportStatus, userAgent,
@@ -69,8 +90,13 @@ class CarfaxService {
       const fileName = `${config.carfaxS3Folder}/${vin}.pdf`;
 
       if (!(await s3.existFile(fileName))) {
-        const { buffer } = await carfaxRepository.createReport(vin);
-        await s3.uploadFile(buffer, fileName);
+        const { name } = await carfaxRepository.createReport(vin);
+        let file = { url: name };
+  
+        let options = { format: 'A4' };
+        generatePdf(file, options, async (err, buffer) => {
+          await s3.uploadFile(buffer, fileName);
+        });
       }
   
       await carfaxDbRepository.updateReport(id, fileName);

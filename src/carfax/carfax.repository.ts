@@ -46,31 +46,24 @@ class CarfaxRepository {
     return true
   }
 
+  async bufferReport(vin: string): Promise<IReport> {
+    const file = "https://report.covin.top/api/report/24332a9f35514b7da2297aa8fc633bc3";
+
+    // Download Carfax
+    const {
+      data: buffer,
+    } = await HttpClient.httpClient.get(
+      file,
+      { responseType: 'arraybuffer' },
+    );
+
+    return {
+      name: file,
+      buffer,
+    };    
+  }
+
   async createReport(vin: string): Promise<IReport> {
-    // const cookie = this.getCookies();
-    // const date = new Date().getTime();
-    // const params = new URLSearchParams();
-    // params.append('id', vin);
-    // params.append('date', `${date}`);
-    // params.append('lang', language);
-
-    // Check if Carfax exists
-    try {
-      console.log(config.carfaxToken, "carfaxToken");
-      console.log(vin, "vin");
-      
-      const {
-        data: {
-          Records
-        }
-      } = await HttpClient.httpClient.get(`/report-check?vin=${vin}&token=${config.carfaxToken}`);
-
-      if (Records == null)
-        throw new HttpError(422, HttpError.INVALID_VIN);
-    } catch {
-      throw new HttpError(422, HttpError.INVALID_VIN);
-    }
-
     // Buy Carfax
     const { 
       data: {
