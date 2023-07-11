@@ -23,12 +23,12 @@ class CarfaxService {
     acceptLanguage: string,
   ): Promise<string> {
     const language = acceptLanguage || 'uk';
-    // const { id: userId } = await verifyUser(
-    //   config.userSdkUrl,
-    //   config.userSdkSecret,
-    //   token as string,
-    // );
-    const userId = '62f3995f8283787f4b4a1231'
+    const { id: userId } = await verifyUser(
+      config.userSdkUrl,
+      config.userSdkSecret,
+      token as string,
+    );
+    // const userId = '62f3995f8283787f4b4a1231'
 
     // if (await carfaxRepository.getRequestCount() <= 0) {
     //   throw new HttpError(503, 'Carfax quota is exceeded');
