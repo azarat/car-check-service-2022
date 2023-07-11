@@ -49,6 +49,14 @@ const carfaxController = (server: FastifyInstance, _, done) => {
     },
   });
 
+  server.post<Body<CallbackDto> & Params<{ id: string }>>('/savepdf/:id', {
+    schema: { hide: true },
+    handler: async (req, res) => {
+      await carfaxService.savepdf(req.body, req.params.id);
+      res.send(200);
+    },
+  });
+
   done();
 };
 
