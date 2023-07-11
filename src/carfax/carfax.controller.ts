@@ -12,7 +12,7 @@ import { userGuard } from '../guards/user.guard';
 const carfaxController = (server: FastifyInstance, _, done) => {
   server.post<Headers<TokenHeadersDto> & Body<InitReportDto>>('/', {
     schema: initReportSchema,
-    // preValidation: userGuard,
+    preValidation: userGuard,
     handler: async (req) => {
       const { token } = req.headers;
       return carfaxService.initReport(req.body, token, req.headers['user-agent'], req.headers['accept-language']);
