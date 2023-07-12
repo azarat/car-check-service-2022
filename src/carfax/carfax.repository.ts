@@ -37,10 +37,10 @@ class CarfaxRepository {
         }
       } = await HttpClient.httpClient.get(`/report-check?vin=${vin}&token=${config.carfaxToken}`);
 
-      if (Records == null)
+      if (Records == null || Records == 0)
         throw new HttpError(404, HttpError.VIN_NOT_FOUND);
     } catch {
-      throw new HttpError(422, HttpError.INVALID_VIN);
+      throw new HttpError(404, HttpError.VIN_NOT_FOUND);
     }
 
     return true
