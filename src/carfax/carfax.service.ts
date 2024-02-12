@@ -13,6 +13,7 @@ import HttpError from '../errors/HttpError';
 import { ReportInfoDto } from './dto/report-info.dto';
 import { getKeys } from '../user-agent';
 import { generatePdf } from 'html-pdf-node';
+import crypto from "crypto"
 
 class CarfaxService {
   private static NOTIFICATION_TYPE = 'CARFAX_PAYED';
@@ -78,12 +79,29 @@ class CarfaxService {
     }
   }
 
-  async payReport(body: CallbackDto, id: string): Promise<void> {
+  async checkReport(body: CallbackDto, id: string): Promise<void> {
     const {
       user, vin, status: reportStatus, userAgent,
     } = await carfaxDbRepository.findById(id);
-    const { privateKey } = getKeys(userAgent);
-    const { status } = Payment.handleCallback(body, privateKey);
+    const { publicKey, privateKey } = getKeys(userAgent);
+    const base64Data = Buffer.from(JSON.stringify({
+      public_key: publicKey,
+      version: 3,
+      action: "status",
+      order_id: id
+    })).toString('base64');
+
+    const signature = privateKey + base64Data + privateKey
+    const sha1 = crypto.createHash('sha1');
+    sha1.update(signature);
+    sha1.digest('base64');
+
+    const { data: { status } } = await axios.post(`https://www.liqpay.ua/api/3/checkout?data=${base64Data}&signature=${signature}`)
+
+    this.generateReport(reportStatus, id, vin, user, status)
+  }
+
+  async generateReport(reportStatus: StatusEnum, id: string, vin: string, user: string, status: string): Promise<void> {
     const isSuccess = ['success', 'wait_accept'].includes(status.toLowerCase());
     if (isSuccess && reportStatus === StatusEnum.IN_PROGRESS) {
 
@@ -129,6 +147,16 @@ class CarfaxService {
         });
       await carfaxDbRepository.updateStatus(id, StatusEnum.DONE);
     }
+  }
+
+  async payReport(body: CallbackDto, id: string): Promise<void> {
+    const {
+      user, vin, status: reportStatus, userAgent,
+    } = await carfaxDbRepository.findById(id);
+    const { privateKey } = getKeys(userAgent);
+    const { status } = Payment.handleCallback(body, privateKey);
+    
+    this.generateReport(reportStatus, id, vin, user, status)
   }
 
   async getReports(token: string): Promise<ReportInfoDto[]> {
