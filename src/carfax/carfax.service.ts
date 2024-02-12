@@ -106,9 +106,11 @@ class CarfaxService {
       (new url.URLSearchParams(dataToCheck)).toString(),
     )
 
-    this.generateReport(reportStatus, id, vin, user, status)
-
-    return status
+    try {
+      await this.generateReport(reportStatus, id, vin, user, status)      
+    } catch (error) {
+      throw new HttpError(402, HttpError.INVALID_VIN);      
+    }
   }
 
   async generateReport(reportStatus: StatusEnum, id: string, vin: string, user: string, status: string): Promise<void> {
