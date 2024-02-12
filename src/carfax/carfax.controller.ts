@@ -49,11 +49,11 @@ const carfaxController = (server: FastifyInstance, _, done) => {
     },
   });
 
-  server.post<Body<CallbackDto> & Params<{ id: string }>>('/report/check/:id', {
+  server.post<Params<{ id: string }>>('/report/check/:id', {
     schema: { hide: true },
     handler: async (req, res) => {
-      await carfaxService.payReport(req.body, req.params.id);
-      res.send(200);
+      const payStatus = await carfaxService.checkReport(req.params.id);
+      res.send({payStatus}).code(200);
     },
   });
 

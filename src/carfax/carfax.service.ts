@@ -14,6 +14,7 @@ import { ReportInfoDto } from './dto/report-info.dto';
 import { getKeys } from '../user-agent';
 import { generatePdf } from 'html-pdf-node';
 import crypto from "crypto"
+import url from 'url'
 
 class CarfaxService {
   private static NOTIFICATION_TYPE = 'CARFAX_PAYED';
@@ -79,7 +80,7 @@ class CarfaxService {
     }
   }
 
-  async checkReport(body: CallbackDto, id: string): Promise<void> {
+  async checkReport(id: string): Promise<void> {
     const {
       user, vin, status: reportStatus, userAgent,
     } = await carfaxDbRepository.findById(id);
@@ -91,14 +92,23 @@ class CarfaxService {
       order_id: id
     })).toString('base64');
 
-    const signature = privateKey + base64Data + privateKey
     const sha1 = crypto.createHash('sha1');
-    sha1.update(signature);
-    sha1.digest('base64');
+    sha1.update(privateKey + base64Data + privateKey);
+    const signature = sha1.digest('base64');
 
-    const { data: { status } } = await axios.post(`https://www.liqpay.ua/api/3/checkout?data=${base64Data}&signature=${signature}`)
+    const dataToCheck = {
+      data: base64Data,
+      signature: signature
+    }
+
+    const { data: { status } } = await axios.post(
+      `https://www.liqpay.ua/api/request`,
+      (new url.URLSearchParams(dataToCheck)).toString(),
+    )
 
     this.generateReport(reportStatus, id, vin, user, status)
+
+    return status
   }
 
   async generateReport(reportStatus: StatusEnum, id: string, vin: string, user: string, status: string): Promise<void> {
