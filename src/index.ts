@@ -16,11 +16,11 @@ const app = fastify({
   logger: true,
 });
 
-app.get('/health', async () => 'Hello World');
+app.get(`/${process.env.API_ENV}/CarCheckService/health`, async () => 'Hello World');
 app.register(formbody);
 app.register(swagger, {
   exposeRoute: true,
-  routePrefix: '/docs',
+  routePrefix: `/${process.env.API_ENV}/CarCheckService/docs`,
   swagger: {
     host: config.apiHost,
     info: {
@@ -43,9 +43,9 @@ app.setErrorHandler((err, req, res) => {
     res.status(500).send(message);
   }
 });
-app.register(carfaxController, { prefix: '/carfax' });
-app.register(partslinkController, { prefix: '/partslink' });
-app.register(carNumberController, { prefix: '/check' });
+app.register(carfaxController, { prefix: `/${process.env.API_ENV}/CarCheckService/carfax` });
+app.register(partslinkController, { prefix: `/${process.env.API_ENV}/CarCheckService/partslink` });
+app.register(carNumberController, { prefix: `/${process.env.API_ENV}/CarCheckService/check` });
 app.register(fastifyCron, {
   jobs: [
     {

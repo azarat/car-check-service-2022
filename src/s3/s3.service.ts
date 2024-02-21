@@ -5,7 +5,12 @@ import config from '../config/config';
 class S3 {
   private readonly s3: AWS.S3;
   constructor() {
-    this.s3 = new AWS.S3({ region: 'eu-central-1' });
+    // this.s3 = new AWS.S3({ region: 'eu-central-1' });
+    this.s3 = new AWS.S3({
+      endpoint: config.digiSpaceEndpoint,
+      accessKeyId: config.digiSpaceAccessKeyId,
+      secretAccessKey: config.digiSpaceSecretAccessKey,
+    });
   }
 
   async uploadFile(buffer: Buffer, name: string): Promise<string> {

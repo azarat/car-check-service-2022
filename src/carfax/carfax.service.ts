@@ -55,7 +55,7 @@ class CarfaxService {
       id,
       config.carfaxPrice,
       `DayDrive LLC / Carfax / ${vin}`,
-      `http://${config.apiHost}/carfax/callback/${id}`,
+      `https://${config.apiHost}/${process.env.API_ENV}/CarCheckService/carfax/callback/${id}`,
     );
     return payment.createPayment(privateKey);
   }
