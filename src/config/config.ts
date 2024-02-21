@@ -72,9 +72,9 @@ class Config {
     this.liqpayAndroidPrivateKey = process.env.LIQPAY_ANDROID_PRIVATE_KEY
     this.checkCarPlate = process.env.CHECKCAR_PLATE
 
-    this.digiSpaceEndpoint = process.env.CHECKCAR_PLATE
-    this.digiSpaceAccessKeyId = process.env.CHECKCAR_PLATE
-    this.digiSpaceSecretAccessKey = process.env.CHECKCAR_PLATE
+    this.digiSpaceEndpoint = process.env.DIGI_SPACE_ENDPOINT
+    this.digiSpaceAccessKeyId = process.env.DIGI_SPACE_ACCESSS_KEY_ID
+    this.digiSpaceSecretAccessKey = process.env.DIGI_SPACE_SECRET_ACCESSS_KEY
   }
 
   async init() {
