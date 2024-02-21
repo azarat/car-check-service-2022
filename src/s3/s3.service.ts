@@ -1,15 +1,17 @@
 import AWS from 'aws-sdk';
-
+import dotenv from 'dotenv';
 import config from '../config/config';
+dotenv.config();
 
 class S3 {
   private readonly s3: AWS.S3;
   constructor() {
     // this.s3 = new AWS.S3({ region: 'eu-central-1' });
+    
     this.s3 = new AWS.S3({
-      endpoint: config.digiSpaceEndpoint,
-      accessKeyId: config.digiSpaceAccessKeyId,
-      secretAccessKey: config.digiSpaceSecretAccessKey,
+      endpoint: process.env.DIGI_SPACE_ENDPOINT,
+      accessKeyId: process.env.DIGI_SPACE_ACCESSS_KEY_ID,
+      secretAccessKey: process.env.DIGI_SPACE_SECRET_ACCESSS_KEY,
     });
   }
 
@@ -43,6 +45,7 @@ class S3 {
       Bucket: config.s3Bucket,
       Key: name,
     }).promise();
+
     return JSON.parse(Body.toString('utf8'));
   }
 
